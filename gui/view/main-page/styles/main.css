@@ -1,0 +1,322 @@
+:root {
+    --green: #4ade80;
+    --green-dim: rgba(74, 222, 128, 0.35);
+    --green-faint: rgba(74, 222, 128, 0.12);
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text-primary: #e6edf3;
+    --text-muted: #6e7681;
+}
+
+html,
+body {
+    background-color: var(--bg);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-app-region: drag;
+    cursor: default;
+    overflow: hidden;
+}
+
+/* ── App container ─────────────────────────────── */
+.app {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+}
+
+.app-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.6px;
+}
+
+/* ── Power button ──────────────────────────────── */
+.power-btn {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.15s ease;
+    -webkit-app-region: no-drag;
+}
+
+.power-btn:hover {
+    transform: scale(1.04);
+}
+
+.power-btn:active {
+    transform: scale(0.96);
+}
+
+.power-btn.on {
+    border-color: var(--green);
+    box-shadow:
+        0 0 0 6px var(--green-faint),
+        0 0 24px var(--green-dim),
+        0 0 48px rgba(74, 222, 128, 0.08);
+    /*animation: glow-pulse 2.5s ease-in-out infinite; */
+}
+
+.power-btn.off {
+    border-color: var(--border);
+    box-shadow: none;
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 6px var(--green-faint),
+            0 0 24px var(--green-dim),
+            0 0 48px rgba(74, 222, 128, 0.08);
+    }
+    50% {
+        box-shadow:
+            0 0 0 10px rgba(74, 222, 128, 0.08),
+            0 0 36px rgba(74, 222, 128, 0.5),
+            0 0 64px rgba(74, 222, 128, 0.12);
+    }
+}
+
+/* ── Logo inside button ────────────────────────── */
+.logo {
+    width: 52px;
+    height: 52px;
+    transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+.power-btn.off .logo {
+    filter: grayscale(1) brightness(0.45);
+    opacity: 0.55;
+}
+
+.power-btn.on .logo {
+    filter: none;
+    opacity: 1;
+}
+
+/* ── Status text ───────────────────────────────── */
+.status-text {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.4s ease;
+}
+
+.status-text.off {
+    color: var(--text-muted);
+}
+
+.status-text.on {
+    color: var(--green);
+}
+
+/* ── Bottom note ───────────────────────────────── */
+.note {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+    -webkit-app-region: drag;
+}
+
+/* ── Close button ──────────────────────────────── */
+.window-controls {
+    position: fixed;
+    top: 8px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 12;
+}
+
+#close-button {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+    transition: background 0.2s ease, color 0.2s ease;
+    padding: 0;
+}
+
+#close-button:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text-primary);
+}
+
+#close-button:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Settings menu ─────────────────────────────── */
+#settings-button {
+    width: 32px;
+    height: 26px;
+    border-radius: 13px;
+    border: 1px solid var(--border);
+    background: rgba(22, 27, 34, 0.9);
+    color: var(--text-primary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+#settings-button:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+#settings-button:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.settings-menu {
+    position: fixed;
+    top: 42px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: calc(100% - 88px);
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(22, 27, 34, 0.96);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    -webkit-app-region: no-drag;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.settings-menu.hidden {
+    display: none;
+}
+
+.menu-item {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-size: 13px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.24);
+}
+
+.menu-item.active {
+    border-color: var(--green);
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.2) inset;
+}
+
+.menu-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.4px;
+    margin-top: 2px;
+}
+
+.size-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: 75px minmax(0, 1fr);
+    gap: 6px 8px;
+    align-items: center;
+}
+
+.field-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.menu-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(13, 17, 23, 0.9);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 7px;
+    font-size: 12px;
+    padding: 8px 10px;
+    outline: none;
+}
+
+.menu-input:focus {
+    border-color: rgba(74, 222, 128, 0.7);
+}
+
+.menu-switches {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.switch-line {
+    font-size: 12px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.settings-feedback {
+    min-height: 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ── Global ────────────────────────────────────── */
+*, *::after, *::before {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}

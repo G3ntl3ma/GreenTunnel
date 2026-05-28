@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Green Tunnel</title>
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-D1R7M2YZ8Q"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-D1R7M2YZ8Q');
+        </script>
+
+        <link rel="stylesheet" href="styles/css-reset.css">
+        <link rel="stylesheet" href="styles/main.css">
+
+        <script>window.$ = window.jQuery = require('jquery');</script>
+        <script type="text/javascript" src="./scripts/main.js"></script>
+    </head>
+
+    <body>
+        <div class="window-controls">
+            <button id="settings-button" tabindex="0" aria-label="Open settings menu">&#9881;</button>
+            <button id="close-button" tabindex="0">&#x2715;</button>
+        </div>
+
+        <div id="settings-menu" class="settings-menu hidden" aria-hidden="true">
+            <button id="menu-toggle-power" class="menu-item" tabindex="0">Turn On</button>
+            <p class="menu-label">Window size</p>
+            <div class="size-options">
+                <button class="menu-item size-option active" data-size-preset="medium" tabindex="0">Medium</button>
+                <button class="menu-item size-option" data-size-preset="small" tabindex="0">Small</button>
+                <button class="menu-item size-option" data-size-preset="large" tabindex="0">Large</button>
+            </div>
+            <p class="menu-label">Proxy server</p>
+            <div class="menu-grid">
+                <label class="field-label" for="setting-ip">IP</label>
+                <input id="setting-ip" class="menu-input" type="text" value="127.0.0.1" tabindex="0">
+
+                <label class="field-label" for="setting-port">Port</label>
+                <input id="setting-port" class="menu-input" type="number" min="1" max="65535" value="8000" tabindex="0">
+            </div>
+            <p class="menu-label">DNS</p>
+            <div class="menu-grid">
+                <label class="field-label" for="setting-dns-type">Type</label>
+                <select id="setting-dns-type" class="menu-input" tabindex="0">
+                    <option value="https">https</option>
+                    <option value="tls">tls</option>
+                    <option value="unencrypted">unencrypted</option>
+                </select>
+
+                <label class="field-label" for="setting-dns-server">Server URL</label>
+                <input id="setting-dns-server" class="menu-input" type="text" tabindex="0">
+
+                <label class="field-label" for="setting-dns-ip">DNS IP</label>
+                <input id="setting-dns-ip" class="menu-input" type="text" tabindex="0">
+
+                <label class="field-label" for="setting-dns-port">DNS Port</label>
+                <input id="setting-dns-port" class="menu-input" type="number" min="1" max="65535" tabindex="0">
+            </div>
+            <div class="menu-switches">
+                <label class="switch-line"><input id="setting-https-only" type="checkbox" tabindex="0"> HTTPS only</label>
+                <label class="switch-line"><input id="setting-system-proxy" type="checkbox" checked tabindex="0"> Automatic system proxy</label>
+                <label class="switch-line"><input id="setting-tls-record-fragmentation" type="checkbox" tabindex="0"> TLS record fragmentation</label>
+            </div>
+            <button id="save-settings" class="menu-item" tabindex="0">Apply Settings</button>
+            <button id="restore-default-settings" class="menu-item" tabindex="0">Restore Defaults</button>
+            <p id="settings-feedback" class="settings-feedback" aria-live="polite"></p>
+        </div>
+
+        <div class="app">
+            <p class="app-title">GreenTunnel</p>
+
+            <button id="on-off-button" class="power-btn toggle off" role="button" tabindex="0">
+                <img class="logo" src="./images/logo.png" alt="Toggle">
+            </button>
+
+            <p id="status-off-on" class="status-text toggle off">is off</p>
+        </div>
+
+        <p class="note">Does not hide your IP address</p>
+    </body>
+</html>

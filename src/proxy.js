@@ -1,0 +1,98 @@
+import net from 'net';
+import { setProxy, unsetProxy, getSystemProxyWarningFromError } from './utils/system-proxy.js';
+import handleRequest from './handlers/request.js';
+import DNSOverTLS from './dns/tls.js';
+import DNSOverHTTPS from './dns/https.js';
+import DNSUnencrypted from './dns/unencrypted.js';
+import config from './config.js';
+import getLogger from './logger.js';
+import { appInit } from './utils/analytics.js';
+
+const logger = getLogger('proxy');
+
+export default class Proxy {
+	constructor(customConfig) {
+		this.config = { ...config, ...customConfig };
+		this.server = undefined;
+		this.isSystemProxySet = false;
+		this.initDNS();
+		appInit(customConfig.source);
+	}
+
+	initDNS() {
+		if (this.config.dns.type === 'https') {
+			this.dns = new DNSOverHTTPS(this.config.dns.server);
+		} else if (this.config.dns.type === 'tls') {
+			this.dns = new DNSOverTLS(this.config.dns.server);
+		} else {
+			this.dns = new DNSUnencrypted(this.config.dns.ip, this.config.dns.port);
+		}
+	}
+
+	async start(options = {}) {
+		options.setProxy = options.setProxy === undefined ? false : options.setProxy;
+		const startStatus = {
+			systemProxyWarning: null,
+		};
+
+		this.server = net.createServer({ pauseOnConnect: true }, clientSocket => {
+			handleRequest(clientSocket, this).catch(err => {
+				logger.debug(String(err));
+			});
+		});
+
+		this.server.on('error', err => {
+			logger.error(err.toString());
+		});
+
+		this.server.on('close', () => {
+			logger.debug('server closed');
+		});
+
+		await new Promise(resolve => {
+			this.server.listen(this.config.port, this.config.ip, () => resolve());
+		});
+
+		const { address, port } = this.server.address();
+		logger.debug(`server listen on ${address} port ${port}`);
+
+		if (options.setProxy) {
+			// Prefer the configured bind IP for system proxy.
+			// `server.address().address` can be a wildcard like `::`, which produces invalid `host:port`
+			// strings for some system proxy implementations (notably Windows).
+			const proxyIp =
+				this.config.ip && this.config.ip !== '0.0.0.0' && this.config.ip !== '::'
+					? this.config.ip
+					: address === '::' || address === '0.0.0.0'
+						? '127.0.0.1'
+						: address;
+			try {
+				await setProxy(proxyIp, port);
+				this.isSystemProxySet = true;
+				logger.debug('system proxy set');
+			} catch (error) {
+				const warning = getSystemProxyWarningFromError(error);
+				if (warning) {
+					startStatus.systemProxyWarning = warning;
+					logger.debug(`[SYSTEM PROXY] warning (${warning.code}) ${warning.message}`);
+				} else {
+					throw error;
+				}
+			}
+		}
+
+		return startStatus;
+	}
+
+	async stop() {
+		if (this.server) {
+			this.server.close();
+		}
+
+		if (this.isSystemProxySet) {
+			await unsetProxy();
+			this.isSystemProxySet = false;
+			logger.debug('system proxy unset');
+		}
+	}
+}
