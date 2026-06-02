@@ -11,13 +11,12 @@ import { hideBin } from 'yargs/helpers';
 import { Proxy, config, getLogger } from '../src/index.js';
 
 const logger = getLogger('cli');
-const SYSTEM_PROXY_CONFIRMATION_MESSAGE = 'The --system-proxy option overrides the current proxy settings. After GreenTunnel is closed, the settings will be restored. Type "yes" to proceed';
-const SYSTEM_PROXY_WARNING_CODES = {
-	LINUX_GNOME_REQUIRED: 'LINUX_GNOME_REQUIRED',
-};
-const DOH_PROBE_TIMEOUT_MS = 4000;
-const DOH_PROBE_HOSTNAME = 'example.com';
+const systemProxyConfirmationMessage = 'The --system-proxy option overrides the current proxy settings. After GreenTunnel is closed, the settings will be restored. Type "yes" to proceed';
+const systemProxyWarning = 'Gnome is required for GreenTunnel to run';
+const DOHProbeTimeoutMS = 4000;
+const DOHProbeHostname = 'example.com';
 
+//Control all options given and validate them
 const argv = yargs(hideBin(process.argv))
 	.usage('Usage: green-tunnel [options]')
 	.usage('Usage: gt [options]')
@@ -158,13 +157,13 @@ function validateIpFlag(flagName, value) {
 
 async function probeDoHServer(dnsServer) {
 	const dohUrl = validateDnsServerUrl(dnsServer);
-	dohUrl.searchParams.set('name', DOH_PROBE_HOSTNAME);
+	dohUrl.searchParams.set('name', DOHProbeHostname);
 	dohUrl.searchParams.set('type', 'A');
 
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => {
 		controller.abort();
-	}, DOH_PROBE_TIMEOUT_MS);
+	}, DOHProbeTimeoutMS);
 
 	try {
 		const response = await fetch(dohUrl.toString(), {
@@ -197,7 +196,7 @@ async function probeDoHServer(dnsServer) {
 		if (!hasIpv4Answer) {
 			throw createFlagValidationError(
 				'--dns-server',
-				`DoH probe returned no usable A record for ${DOH_PROBE_HOSTNAME}`,
+				`DoH probe returned no usable A record for ${DOHProbeHostname}`,
 				'Use a DNS-over-HTTPS endpoint like https://cloudflare-dns.com/dns-query'
 			);
 		}
@@ -205,7 +204,7 @@ async function probeDoHServer(dnsServer) {
 		if (error?.name === 'AbortError') {
 			throw createFlagValidationError(
 				'--dns-server',
-				`DoH probe timed out after ${DOH_PROBE_TIMEOUT_MS}ms`,
+				`DoH probe timed out after ${DOHProbeTimeoutMS}ms`,
 				'Use a reachable DNS-over-HTTPS endpoint'
 			);
 		}
@@ -246,9 +245,18 @@ function printBanner() {
 function printAlert(proxy) {
 	console.log('\n');
 	console.log('    ' + chalk.bgHex(MAIN_COLOR).black(' Note: GreenTunnel does not hide your IP address '));
-	console.log('      ' + chalk.hex(MAIN_COLOR)(' https://github.com/SadeghHayeri/GreenTunnel '));
-	console.log('\n      ' + chalk.white(` GreenTunnel is running at ${proxy.server.address().address}:${proxy.server.address().port}. `));
-	console.log('\n\n\n\n\n' + chalk.white(`Press Ctrl+C to exit`))
+	console.log('      ' + chalk.hex(MAIN_COLOR)(' https://github.com/SadeghHayeri/GreenTunnel \n\n'));
+
+	console.log(chalk.white(`proxy-server-address:\t\t${argv['ip']}`))
+	console.log(chalk.white(`proxy-server-port:\t\t${argv['port']}`))
+	console.log(chalk.white(`https-only:\t\t\t${argv['https-only']}`))
+	console.log(chalk.white(`TLS Record Fragmentation:\t${argv['tls-record-fragmentation']}`))
+	console.log(chalk.white(`DNS Type:\t\t\t${argv['dns-type']}`));
+
+	if(argv["dns-type"]=== "unencrypted"){
+		console.log(chalk.white(`DNS-Server :\t\t\t${argv['dns-server']}`));
+		console.log(chalk.white(`DNS Port:\t\t\t${argv['dns-port']}`));
+	}
 }
 
 function showSpinner() {
@@ -258,6 +266,7 @@ function showSpinner() {
 		text: '',
 		color: 'green'
 	}).start();
+	console.log('\n\n' + chalk.white(`Press Ctrl+C to exit`) + '\n\n\n')
 }
 
 function printSystemProxyWarning(systemProxyWarning) {
@@ -265,7 +274,7 @@ function printSystemProxyWarning(systemProxyWarning) {
 		return;
 	}
 
-	if (systemProxyWarning.code === SYSTEM_PROXY_WARNING_CODES.LINUX_GNOME_REQUIRED) {
+	if (systemProxyWarning.code === systemProxyWarning) {
 		console.warn(chalk.yellow('\nWarning: Automatic system proxy is not supported on this Linux desktop.'));
 		console.warn(chalk.yellow('GreenTunnel is running, but your system proxy settings were not changed.'));
 		console.warn(chalk.yellow('Current support requires GNOME (gsettings).\n'));
@@ -292,7 +301,7 @@ async function canProceedWithSystemProxy() {
 	});
 
 	try {
-		const answer = String(await rl.question(`${SYSTEM_PROXY_CONFIRMATION_MESSAGE} `)).trim().toLowerCase();
+		const answer = String(await rl.question(`${systemProxyConfirmationMessage} `)).trim().toLowerCase();
 		return answer === 'yes' || answer === 'y';
 	} finally {
 		rl.close();
@@ -306,6 +315,7 @@ async function main() {
 
 	await validateCliFlags();
 
+	//confirm that the user is ok with overwriting the system proxy settings
 	const hasConfirmation = await canProceedWithSystemProxy();
 	if (!hasConfirmation) {
 		console.log('Startup canceled.');
@@ -327,6 +337,7 @@ async function main() {
 		'tlsRecordFragmentation': argv['tls-record-fragmentation']
 	});
 
+	//close the application properly. Make sure all system settings are restored
 	const exitTrap = async () => {
 		logger.debug('Caught interrupt signal');
 		await proxy.stop();
