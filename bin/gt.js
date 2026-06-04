@@ -9,14 +9,14 @@ import net from 'net';
 import { createInterface } from 'readline/promises';
 import { hideBin } from 'yargs/helpers';
 import { Proxy, config, getLogger } from '../src/index.js';
+import { UnsupportedSystemProxyError } from '../src/utils/system-proxy.js';
 
 const logger = getLogger('cli');
-const systemProxyConfirmationMessage = 'The --system-proxy option overrides the current proxy settings. After GreenTunnel is closed, the settings will be restored. Type "yes" to proceed';
-const systemProxyWarning = 'Gnome is required for GreenTunnel to run';
+const systemProxyConfirmationMessage = 'The --system-proxy option overrides the current proxy settings.\nAfter GreenTunnel is closed, the settings will be restored.\nType "yes" to proceed';
 const DOHProbeTimeoutMS = 4000;
 const DOHProbeHostname = 'example.com';
 
-//Control all options given and validate them
+//Check all options given, check for typos and validate all options
 const argv = yargs(hideBin(process.argv))
 	.usage('Usage: green-tunnel [options]')
 	.usage('Usage: gt [options]')
@@ -230,6 +230,7 @@ async function validateCliFlags() {
 	}
 }
 
+//Print out all Info for the CLI
 function printBanner() {
 	console.log();
 	console.log('                          ' + chalk.bgHex(MAIN_COLOR)('    '));
@@ -269,17 +270,6 @@ function showSpinner() {
 	console.log('\n\n' + chalk.white(`Press Ctrl+C to exit`) + '\n\n\n')
 }
 
-function printSystemProxyWarning(systemProxyWarning) {
-	if (!systemProxyWarning) {
-		return;
-	}
-
-	if (systemProxyWarning.code === systemProxyWarning) {
-		console.warn(chalk.yellow('\nWarning: Automatic system proxy is not supported on this Linux desktop.'));
-		console.warn(chalk.yellow('GreenTunnel is running, but your system proxy settings were not changed.'));
-		console.warn(chalk.yellow('Current support requires GNOME (gsettings).\n'));
-	}
-}
 
 async function canProceedWithSystemProxy() {
 	if (!argv['system-proxy']) {
@@ -364,7 +354,10 @@ async function main() {
 	process.on('uncaughtException', errorTrap);
 
 	const startStatus = await proxy.start({ setProxy: argv['system-proxy'] });
-	printSystemProxyWarning(startStatus.systemProxyWarning);
+	const warning = startStatus?.error;
+    if (warning instanceof UnsupportedSystemProxyError) {
+		throw warning;
+	}
 
 	if (!argv['silent'] && !argv['verbose']) {
 		clear();

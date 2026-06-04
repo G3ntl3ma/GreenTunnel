@@ -14,6 +14,7 @@ dialog.showErrorBox = function(title, content) {
 };
 
 const setupEvents = require('./installers/windows/setupEvents');
+const { UnsupportedSystemProxyError } = require('../src/utils/system-proxy');
 
 if (setupEvents.handleSquirrelEvent()) {
     return;
@@ -29,7 +30,6 @@ const WINDOW_SIZE_PRESETS = {
     large: { width: 360, height: 360 },
 };
 const SYSTEM_PROXY_CONFIRM_MESSAGE = 'Starting GreenTunnel with automatic system proxy enabled will temporarily change the system proxy settings. The settings will be restored when GreenTunnel is deactivated. Do you want to proceed?';
-const LINUX_GNOME_REQUIREMENT_WARNING_CODE = 'LINUX_GNOME_REQUIRED';
 const LINUX_GNOME_REQUIREMENT_WARNING_MESSAGE = 'Automatic system proxy on Linux currently requires GNOME (gsettings). GreenTunnel was not enabled.';
 const DEFAULT_PROXY_SETTINGS = {
     ip: '127.0.0.1',
@@ -208,9 +208,10 @@ async function turnOn() {
         source: 'GUI',
         tlsRecordFragmentation: proxySettings.tlsRecordFragmentation,
     });
+    
     const startStatus = await proxy.start({setProxy: proxySettings.systemProxy});
-    const warningCode = startStatus?.systemProxyWarning?.code;
-    if (warningCode === LINUX_GNOME_REQUIREMENT_WARNING_CODE) {
+    const warning = startStatus?.error;
+    if (warning instanceof UnsupportedSystemProxyError) {
         await turnOff();
         await showLinuxGnomeRequirementWarning();
         return false;

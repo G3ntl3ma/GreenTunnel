@@ -10,15 +10,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const logger = getLogger('system-proxy');
 const exec = util.promisify(_exec);
-const SYSTEM_PROXY_WARNING_CODES = Object.freeze({
-	LINUX_GNOME_REQUIRED: 'LINUX_GNOME_REQUIRED',
-});
 
-class UnsupportedSystemProxyError extends Error {
-	constructor(message, warningCode) {
-		super(message);
+export class UnsupportedSystemProxyError extends Error {
+	constructor() {
+		super([
+			'================= ERROR ================',
+			'GreenTunnel cannot enable automatic system proxy',
+			'Reason: GNOME (gsettings) is required on Linux.',
+			'Tip: run with --system-proxy=false and set the proxy manually',
+			'========================================'
+		].join('\n'));
 		this.name = 'UnsupportedSystemProxyError';
-		this.warningCode = warningCode;
+		this.warningCode = 'LINUX_GNOME_REQUIRED';
 	}
 }
 
@@ -36,40 +39,24 @@ class SystemProxy {
 class LinuxSystemProxy extends SystemProxy {
 	static initialSettings = null;
 
-	static _getDesktopEnvironment() {
-		return String(process.env.XDG_CURRENT_DESKTOP || process.env.DESKTOP_SESSION || '').toLowerCase();
-	}
-
-	static _isLikelyGnomeDesktop() {
-		const desktop = this._getDesktopEnvironment();
-		return desktop.includes('gnome') || desktop.includes('ubuntu') || desktop.includes('unity') || desktop.includes('cinnamon');
-	}
-
+	//Check if GNOME is installed and can be used
 	static async ensureSupported() {
-		if (!this._isLikelyGnomeDesktop()) {
-			throw new UnsupportedSystemProxyError(
-				'Automatic system proxy on Linux currently requires GNOME (gsettings).',
-				SYSTEM_PROXY_WARNING_CODES.LINUX_GNOME_REQUIRED
-			);
+		const desktop = String(process.env.XDG_CURRENT_DESKTOP || process.env.DESKTOP_SESSION || '').toLowerCase();
+		if (!desktop.includes("gnome") && !desktop.includes("unity")) {
+			throw new UnsupportedSystemProxyError();
 		}
 
 		try {
 			const { stdout } = await exec('gsettings writable org.gnome.system.proxy mode');
 			if (!/^true$/i.test(String(stdout || '').trim())) {
-				throw new UnsupportedSystemProxyError(
-					'Automatic system proxy on Linux currently requires GNOME (gsettings).',
-					SYSTEM_PROXY_WARNING_CODES.LINUX_GNOME_REQUIRED
-				);
+				throw new UnsupportedSystemProxyError();
 			}
 		} catch (error) {
 			if (error instanceof UnsupportedSystemProxyError) {
 				throw error;
 			}
 
-			throw new UnsupportedSystemProxyError(
-				'Automatic system proxy on Linux currently requires GNOME (gsettings).',
-				SYSTEM_PROXY_WARNING_CODES.LINUX_GNOME_REQUIRED
-			);
+			throw new UnsupportedSystemProxyError();
 		}
 	}
 
@@ -459,13 +446,4 @@ export async function unsetProxy() {
 	}
 }
 
-export function getSystemProxyWarningFromError(error) {
-	if (error instanceof UnsupportedSystemProxyError) {
-		return {
-			code: error.warningCode,
-			message: error.message,
-		};
-	}
 
-	return null;
-}

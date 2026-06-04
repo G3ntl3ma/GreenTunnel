@@ -1,5 +1,5 @@
 import net from 'net';
-import { setProxy, unsetProxy, getSystemProxyWarningFromError } from './utils/system-proxy.js';
+import { setProxy, unsetProxy, UnsupportedSystemProxyError} from './utils/system-proxy.js';
 import handleRequest from './handlers/request.js';
 import DNSOverTLS from './dns/tls.js';
 import DNSOverHTTPS from './dns/https.js';
@@ -69,10 +69,8 @@ export default class Proxy {
 				this.isSystemProxySet = true;
 				logger.debug('system proxy set');
 			} catch (error) {
-				const warning = getSystemProxyWarningFromError(error);
-				if (warning) {
-					startStatus.systemProxyWarning = warning;
-					logger.debug(`[SYSTEM PROXY] warning (${warning.code}) ${warning.message}`);
+				if(error instanceof UnsupportedSystemProxyError){
+					startStatus.error = error;
 				} else {
 					throw error;
 				}
