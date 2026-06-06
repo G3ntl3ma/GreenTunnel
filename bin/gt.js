@@ -245,14 +245,17 @@ function printBanner() {
 }
 
 function printAlert(proxy) {
-	console.log('\n');
 	console.log('    ' + chalk.bgHex(MAIN_COLOR).black(' Note: GreenTunnel does not hide your IP address '));
-	console.log('      ' + chalk.hex(MAIN_COLOR)(' https://github.com/SadeghHayeri/GreenTunnel \n\n'));
+	console.log('      ' + chalk.hex(MAIN_COLOR)(' https://github.com/SadeghHayeri/GreenTunnel '));
 
-	console.log(chalk.white(`proxy-server-address:\t\t${argv['ip']}`))
-	console.log(chalk.white(`proxy-server-port:\t\t${argv['port']}`))
-	console.log(chalk.white(`https-only:\t\t\t${argv['https-only']}`))
-	console.log(chalk.white(`TLS Record Fragmentation:\t${argv['tls-record-fragmentation']}`))
+	console.log(chalk.red('Caution: deactivate GreenTunnel before closing!'));
+	console.log(chalk.red('Improperly closing GreenTunnel can cause problems'));
+	console.log(chalk.red('With the internet connection'));
+
+	console.log(chalk.white(`proxy-server-address:\t\t${argv['ip']}`));
+	console.log(chalk.white(`proxy-server-port:\t\t${argv['port']}`));
+	console.log(chalk.white(`https-only:\t\t\t${argv['https-only']}`));
+	console.log(chalk.white(`TLS Record Fragmentation:\t${argv['tls-record-fragmentation']}`));
 	console.log(chalk.white(`DNS Type:\t\t\t${argv['dns-type']}`));
 
 	if(argv["dns-type"]=== "unencrypted"){
@@ -268,7 +271,7 @@ function showSpinner() {
 		text: '',
 		color: 'green'
 	}).start();
-	console.log('\n\n' + chalk.white(`Press Ctrl+C to exit`) + '\n\n\n')
+	console.log(chalk.white(`Press Ctrl+C to exit`))
 }
 
 

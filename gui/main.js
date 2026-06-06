@@ -25,9 +25,9 @@ let Proxy;
 let isOn = false;
 let hasConfirmedSystemProxyThisLaunch = false;
 const windowSizePresets = {
-    small: { width: 260, height: 260 },
-    medium: { width: 300, height: 300 },
-    large: { width: 360, height: 360 },
+    small: { width: 300, height: 340 },
+    medium: { width: 360, height: 360 },
+    large: {width: 400, height: 400}
 };
 
 const defaultProxySettings = {
@@ -284,7 +284,7 @@ function createWindow() {
 
     win = new BrowserWindow({
         width: 300,
-        height: 300,
+        height: 340,
         x: stateManager.x,
         y: stateManager.y,
         maximizable: false,

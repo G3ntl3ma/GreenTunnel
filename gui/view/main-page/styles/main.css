@@ -129,15 +129,40 @@ body {
 }
 
 /* ── Bottom note ───────────────────────────────── */
-.note {
+.footer-messages{
     position: fixed;
     bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    padding: 0 12px;
+    -webkit-app-region: drag;
+}
+.note {
+    position: static;
+    bottom: auto;
+    left: auto;
+    transform: none;
     font-size: 10px;
     color: var(--text-muted);
     letter-spacing: 0.3px;
     -webkit-app-region: drag;
+    max-width: 100%;
+}
+.warning {
+    position: static;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    font-size: 10px;
+    color: red;
+    letter-spacing: 0.3px;
+    -webkit-app-region: drag;
+    max-width: 100%;
 }
 
 /* ── Close button ──────────────────────────────── */
