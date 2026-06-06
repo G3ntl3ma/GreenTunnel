@@ -24,14 +24,13 @@ let win, tray, proxy;
 let Proxy;
 let isOn = false;
 let hasConfirmedSystemProxyThisLaunch = false;
-const WINDOW_SIZE_PRESETS = {
+const windowSizePresets = {
     small: { width: 260, height: 260 },
     medium: { width: 300, height: 300 },
     large: { width: 360, height: 360 },
 };
-const SYSTEM_PROXY_CONFIRM_MESSAGE = 'Starting GreenTunnel with automatic system proxy enabled will temporarily change the system proxy settings. The settings will be restored when GreenTunnel is deactivated. Do you want to proceed?';
-const LINUX_GNOME_REQUIREMENT_WARNING_MESSAGE = 'Automatic system proxy on Linux currently requires GNOME (gsettings). GreenTunnel was not enabled.';
-const DEFAULT_PROXY_SETTINGS = {
+
+const defaultProxySettings = {
     ip: '127.0.0.1',
     port: 8000,
     httpsOnly: false,
@@ -44,8 +43,7 @@ const DEFAULT_PROXY_SETTINGS = {
     systemProxy: true,
     tlsRecordFragmentation: false,
 };
-const PROXY_SETTINGS_FILE_NAME = 'proxy-settings.json';
-const DNS_TYPES = new Set(['https', 'tls', 'unencrypted']);
+
 
 const menuItems = [
     {
@@ -84,14 +82,14 @@ const menuItems = [
         },
     },
 ];
-let proxySettings = cloneSettings(DEFAULT_PROXY_SETTINGS);
+let proxySettings = cloneSettings(defaultProxySettings);
 
 function cloneSettings(settings) {
     return JSON.parse(JSON.stringify(settings));
 }
 
 function getProxySettingsFilePath() {
-    return path.join(app.getPath('userData'), PROXY_SETTINGS_FILE_NAME);
+    return path.join(app.getPath('userData'), 'proxy-settings.json');
 }
 
 async function saveProxySettings(settings) {
@@ -101,7 +99,7 @@ async function saveProxySettings(settings) {
 }
 
 async function loadProxySettings() {
-    const defaults = cloneSettings(DEFAULT_PROXY_SETTINGS);
+    const defaults = cloneSettings(defaultProxySettings);
     const filePath = getProxySettingsFilePath();
 
     try {
@@ -147,7 +145,7 @@ function normalizeProxySettings(rawSettings) {
 
     assertValidPort(next.port, 'Port');
 
-    if (!DNS_TYPES.has(next.dns.type)) {
+    if (!['https', 'tls', 'unencrypted'].includes(next.dns.type)) {
         throw new Error('DNS type must be one of: https, tls, unencrypted.');
     }
 
@@ -237,7 +235,7 @@ async function confirmSystemProxyActivation() {
         defaultId: 0,
         cancelId: 1,
         noLink: true,
-        message: SYSTEM_PROXY_CONFIRM_MESSAGE,
+        message: 'Starting GreenTunnel with automatic system proxy enabled will temporarily change the system proxy settings. The settings will be restored when GreenTunnel is deactivated. Do you want to proceed?',
     };
 
     const response = win
@@ -253,7 +251,7 @@ async function showLinuxGnomeRequirementWarning() {
         buttons: ['OK'],
         defaultId: 0,
         noLink: true,
-        message: LINUX_GNOME_REQUIREMENT_WARNING_MESSAGE,
+        message: 'Automatic system proxy on Linux currently requires GNOME (gsettings). GreenTunnel was not enabled.',
     };
 
     const response = win
@@ -295,7 +293,7 @@ function createWindow() {
         resizable: false,
         show: false,
 
-        title: 'Green Tunnel',
+        title: 'GreenTunnel',
         frame: false,
         transparent: true,
         webPreferences: {
@@ -387,7 +385,7 @@ ipcMain.on('on-off-button', (event, arg) => {
 });
 
 ipcMain.on('set-window-size', (event, preset) => {
-    const selectedPreset = WINDOW_SIZE_PRESETS[preset];
+    const selectedPreset = windowSizePresets[preset];
     if (!win || !selectedPreset) {
         return;
     }
@@ -423,7 +421,7 @@ ipcMain.handle('update-proxy-settings', async (event, nextSettings) => {
 });
 
 ipcMain.handle('reset-proxy-settings', async () => {
-    const defaults = normalizeProxySettings(cloneSettings(DEFAULT_PROXY_SETTINGS));
+    const defaults = normalizeProxySettings(cloneSettings(defaultProxySettings));
     await saveProxySettings(defaults);
     proxySettings = defaults;
 

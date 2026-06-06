@@ -15,6 +15,7 @@ const logger = getLogger('cli');
 const systemProxyConfirmationMessage = 'The --system-proxy option overrides the current proxy settings.\nAfter GreenTunnel is closed, the settings will be restored.\nType "yes" to proceed';
 const DOHProbeTimeoutMS = 4000;
 const DOHProbeHostname = 'example.com';
+const MAIN_COLOR = '84C66F';
 
 //Check all options given, check for typos and validate all options
 const argv = yargs(hideBin(process.argv))
@@ -122,7 +123,7 @@ const argv = yargs(hideBin(process.argv))
 	.strict()
 	.parseSync();
 
-const MAIN_COLOR = '84C66F';
+
 
 function createFlagValidationError(flagName, details, hint) {
 	return new Error(`${flagName} is invalid: ${details}. ${hint}`);
