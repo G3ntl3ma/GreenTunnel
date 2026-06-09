@@ -150,6 +150,34 @@ Standard DNS lookups can be intercepted or spoofed by ISPs to block domains at t
 
 ---
 
+## Troubleshooting
+
+If GreenTunnel is not shut down properly, the system proxy settings might not be restored to their previous values. Here is how the system settings can be restored:
+
+### Windows
+
+#### Windows Settings
+Settings -> Network and Internet -> Proxy -> Use proxy server -> turn off
+
+#### Terminal
+
+```bash
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 0 /f
+
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d "" /f
+```
+
+### Linux
+
+#### GNOME settings
+
+Settings -> Network -> Network Proxy -> Off
+
+#### Terminal
+```bash
+gsettings reset-recursively org.gnome.system.proxy
+```
+
 ## Contributing
 
 Pull requests and issues are always welcome.
