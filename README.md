@@ -71,17 +71,17 @@ Usage: green-tunnel [options]
 Usage: gt [options]
 
 Options:
-  --ip                   IP address to bind proxy server     [string]  [default: "127.0.0.1"]
-  --port                 Port to bind proxy server           [number]  [default: 8000]
-  --https-only           Block insecure HTTP requests, allow only HTTPS requests      [boolean] [default: false]
-  --dns-type             DNS resolver type                   [string]  [choices: "https", "tls", "unencrypted"] [default: "https"]
-  --dns-server           DNS server URL, only used when dns-type is https                      [string]  [default: "https://cloudflare-dns.com/dns-query"]
-  --dns-ip               IP for dns-type=unencrypted              [string]  [default: "127.0.0.1"]
-  --dns-port             Port for dns-type=unencrypted            [number]  [default: 53]
-  --tls-record-frag...   Enable TLS record fragmentation for stricter DPI evasion     [boolean] [default: false]
-  --silent, -s           Run in silent mode                  [boolean] [default: false]
-  --verbose, -v          Debug mode (e.g. 'green-tunnel:*')  [string]
-  --system-proxy         Auto-set system proxy. restores previous settings on exit               [boolean] [default: true]
+  --ip                   IP address to bind proxy server                            [string]  [default: "127.0.0.1"]
+  --port                 Port to bind proxy server                                  [number]  [default: 8000]
+  --https-only           Allow only HTTPS requests                                  [boolean] [default: false]
+  --dns-type             DNS resolver type                                          [string]  [choices: "https", "tls", "unencrypted"] [default: "https"]
+  --dns-server           DNS server URL, for --dns-type=https                       [string]  [default: "https://cloudflare-dns.com/dns-query"]
+  --dns-ip               IP for dns-type=unencrypted                                [string]  [default: "127.0.0.1"]
+  --dns-port             Port for dns-type=unencrypted                              [number]  [default: 53]
+  --tls-record-frag...   Enable TLS record fragmentation for stricter DPI evasion   [boolean] [default: false]
+  --silent, -s           Run in silent mode                                         [boolean] [default: false]
+  --verbose, -v          Debug mode (e.g. 'green-tunnel:*')                         [string]
+  --system-proxy         Auto-set system proxy. restores previous settings on exit  [boolean] [default: true]
   --help, -h             Show help
   --version, -V          Show version number
   --yes                  used in scripts/CI to bypass system-proxy override
