@@ -339,6 +339,10 @@ body {
     color: var(--text-muted);
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* ── Global ────────────────────────────────────── */
 *, *::after, *::before {
     -webkit-user-select: none;

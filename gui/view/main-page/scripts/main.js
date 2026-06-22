@@ -50,7 +50,18 @@ $(document).ready(function() {
         $('#setting-https-only').prop('checked', Boolean(settings.httpsOnly));
         $('#setting-system-proxy').prop('checked', Boolean(settings.systemProxy));
         $('#setting-tls-record-fragmentation').prop('checked', Boolean(settings.tlsRecordFragmentation));
+        
+        updateDnsFieldVisibility();
     }
+
+    function updateDnsFieldVisibility() {
+        const type = String($('#setting-dns-type').val());
+    
+        $('.dns-https').toggleClass('hidden', !(type === 'https'));
+        $('.dns-unencrypted').toggleClass('hidden', !(type === 'unencrypted'));
+    }
+    
+    $('#setting-dns-type').on('change', updateDnsFieldVisibility);
 
     $('#close-button').on('click', () => {
         ipcRenderer.send('close-button');

@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs/promises');
 const os = require('os');
 const net = require('net');
+let gt;
 
 // disable any dialog box!
 const electron = require('electron');
@@ -105,7 +106,7 @@ async function loadProxySettings() {
     try {
         const raw = await fs.readFile(filePath, 'utf8');
         const parsed = JSON.parse(raw);
-        return normalizeProxySettings(parsed);
+        return await normalizeProxySettings(parsed);
     } catch (error) {
         if (error && error.code === 'ENOENT') {
             return defaults;
@@ -118,13 +119,7 @@ async function loadProxySettings() {
     }
 }
 
-function assertValidPort(value, label) {
-    if (!Number.isInteger(value) || value < 1 || value > 65535) {
-        throw new Error(`${label} must be an integer between 1 and 65535.`);
-    }
-}
-
-function normalizeProxySettings(rawSettings) {
+async function normalizeProxySettings(rawSettings) {
     const next = {
         ip: String(rawSettings?.ip ?? '').trim(),
         port: Number(rawSettings?.port),
@@ -139,28 +134,19 @@ function normalizeProxySettings(rawSettings) {
         tlsRecordFragmentation: Boolean(rawSettings?.tlsRecordFragmentation),
     };
 
-    if (!net.isIP(next.ip)) {
-        throw new Error('IP must be a valid IP address.');
+    //gui and cli have a different format for storing the settings
+    //transfer only the settings that require extensive validation
+    const args = {
+        "ip": next["ip"],
+        "port": next["port"],
+        "https-only": next["httpsOnly"],
+        "dns-type": next["dns"]["type"],
+        "dns-server": next["dns"]["server"],
+        "dns-ip": next["dns"]["ip"],
+        "dns-port": next["dns"]["port"],
     }
+    await gt.validateFlags(args);
 
-    assertValidPort(next.port, 'Port');
-
-    if (!['https', 'tls', 'unencrypted'].includes(next.dns.type)) {
-        throw new Error('DNS type must be one of: https, tls, unencrypted.');
-    }
-
-    try {
-        // Keep behavior aligned with CLI (--dns-server validation)
-        new URL(next.dns.server);
-    } catch (error) {
-        throw new Error('DNS server must be a valid URL.');
-    }
-
-    if (!net.isIP(next.dns.ip)) {
-        throw new Error('DNS IP must be a valid IP address.');
-    }
-
-    assertValidPort(next.dns.port, 'DNS port');
     return next;
 }
 
@@ -334,7 +320,7 @@ app.on('activate', () => {
 
 app.whenReady().then(async () => {
     // green-tunnel is an ES module — must use dynamic import
-    const gt = await import('green-tunnel');
+    gt = await import('green-tunnel');
     Proxy = gt.Proxy;
     proxySettings = await loadProxySettings();
 
@@ -409,7 +395,7 @@ ipcMain.handle('get-proxy-settings', () => {
 });
 
 ipcMain.handle('update-proxy-settings', async (event, nextSettings) => {
-    const normalized = normalizeProxySettings(nextSettings);
+    const normalized = await normalizeProxySettings(nextSettings);
     await saveProxySettings(normalized);
     proxySettings = normalized;
 
@@ -421,7 +407,7 @@ ipcMain.handle('update-proxy-settings', async (event, nextSettings) => {
 });
 
 ipcMain.handle('reset-proxy-settings', async () => {
-    const defaults = normalizeProxySettings(cloneSettings(defaultProxySettings));
+    const defaults = await normalizeProxySettings(cloneSettings(defaultProxySettings));
     await saveProxySettings(defaults);
     proxySettings = defaults;
 

@@ -18,7 +18,6 @@
         </div>
 
         <div id="settings-menu" class="settings-menu hidden" aria-hidden="true">
-            <button id="menu-toggle-power" class="menu-item" tabindex="0">Turn On</button>
             <p class="menu-label">Window size</p>
             <div class="size-options">
                 <button class="menu-item size-option active" data-size-preset="small" tabindex="0">Small</button>
@@ -35,21 +34,21 @@
             </div>
             <p class="menu-label">DNS</p>
             <div class="menu-grid">
-                <label class="field-label" for="setting-dns-type">Type</label>
+                <label class="field-label" for="setting-dns-type">DNS Type</label>
                 <select id="setting-dns-type" class="menu-input" tabindex="0">
-                    <option value="https">https</option>
-                    <option value="tls">tls</option>
-                    <option value="unencrypted">unencrypted</option>
+                    <option value="https">HTTPS</option>
+                    <option value="tls">TLS</option>
+                    <option value="unencrypted">Unencrypted</option>
                 </select>
 
-                <label class="field-label" for="setting-dns-server">Server URL</label>
-                <input id="setting-dns-server" class="menu-input" type="text" tabindex="0">
+                <label class="field-label dns-https" for="setting-dns-server">Server URL</label>
+                <input id="setting-dns-server" class="menu-input dns-https" type="text" tabindex="0">
 
-                <label class="field-label" for="setting-dns-ip">DNS IP</label>
-                <input id="setting-dns-ip" class="menu-input" type="text" tabindex="0">
+                <label class="field-label dns-unencrypted" for="setting-dns-ip">DNS IP</label>
+                <input id="setting-dns-ip" class="menu-input dns-unencrypted" type="text" tabindex="0">
 
-                <label class="field-label" for="setting-dns-port">DNS Port</label>
-                <input id="setting-dns-port" class="menu-input" type="number" min="1" max="65535" tabindex="0">
+                <label class="field-label dns-unencrypted" for="setting-dns-port">DNS Port</label>
+                <input id="setting-dns-port" class="menu-input dns-unencrypted" type="number" min="1" max="65535" tabindex="0">
             </div>
             <div class="menu-switches">
                 <label class="switch-line"><input id="setting-https-only" type="checkbox" tabindex="0"> HTTPS only</label>

@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import {exec as _exec, spawn} from 'child_process';
 import Registry from 'winreg';
 import getLogger from '../logger.js';
+import { resetWininetSettings } from '../scripts/windows/wininet-reset-settings.js';
+import { reset } from 'koffi';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -371,43 +373,7 @@ static async findInitialState(regKey) {
 	}
 
 	static _resetWininetProxySettings() {
-		return new Promise((resolve, reject) => {
-			const scriptPath = path.join(__dirname, '..', 'scripts', 'windows', 'wininet-reset-settings.ps1');
-			const child = spawn("powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", scriptPath], { windowsHide: true });
-			child.stdout.setEncoding('utf8');
-			let settled = false;
-			let out = '';
-			let errOut = '';
-			child.stdout.on("data", (data) => {
-				out += String(data);
-				if (data.includes('True')) {
-					if (settled) return;
-					settled = true;
-					resolve();
-				} else {
-					// keep waiting for close; some environments don't print True
-				}
-			});
-
-			child.stderr.on("data", (err) => {
-				errOut += String(err);
-				if (settled) return;
-				settled = true;
-				reject(err);
-			});
-
-			child.on('close', (code, signal) => {
-				if (settled) return;
-				settled = true;
-				if (code === 0) {
-					resolve();
-				} else {
-					reject(errOut || out || `wininet reset exited with code ${code}`);
-				}
-			});
-
-			child.stdin.end();
-		});
+		resetWininetSettings();
 	}
 }
 
