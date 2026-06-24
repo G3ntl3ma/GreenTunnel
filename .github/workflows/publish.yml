@@ -20,6 +20,10 @@ jobs:
       - name: Pack local GreenTunnel core
         working-directory: .
         run: npm pack
+      
+      - name: Install Packed Core
+        working-directory: ./gui
+        run: npm install ../green-tunnel-2.0.2.tgz --save
 
       - name: Install Dependencies
         working-directory: ./gui
@@ -60,6 +64,10 @@ jobs:
       - name: Pack local GreenTunnel core
         working-directory: .
         run: npm pack
+
+      - name: Install Packed Core
+        working-directory: ./gui
+        run: npm install ../green-tunnel-2.0.2.tgz --save
 
       - name: Install Dependencies
         working-directory: ./gui
@@ -104,6 +112,10 @@ jobs:
       - name: Pack local GreenTunnel core
         working-directory: .
         run: npm pack
+
+      - name: Install Packed Core
+        working-directory: ./gui
+        run: npm install ../green-tunnel-2.0.2.tgz --save
 
       - name: Install Dependencies
         working-directory: ./gui
