@@ -60,6 +60,29 @@ After installation, run with `gt` or `green-tunnel`.
 docker run -p 8000:8000 sadeghhayeri/greentunnel
 ```
 
+## Uninstalling
+
+### npm
+```bash
+npm uninstall -g green-tunnel
+```
+
+### GUI
+
+**Windows:** Settings -> Apps -> Green Tunnel -> uninstall
+
+**macOS:** Move `green-tunnel.app` from Applications to Trash
+
+**Linux (.deb):**
+```bash
+sudo apt remove green-tunnel
+```
+**Docker:**
+```bash
+docker stop <container-name>
+docker rm <container-name>
+```
+
 ---
 
 ## Usage
