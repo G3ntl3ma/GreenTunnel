@@ -34,7 +34,7 @@ function getInstallerConfig () {
     const outPath = path.join(rootPath, 'release-builds');
 
     return Promise.resolve({
-        appDirectory: path.join(outPath, 'green-tunnel-win32-ia32'),
+        appDirectory: path.join(outPath, 'green-tunnel-win32-x64'),
         authors: 'Sadegh Hayeri',
         noMsi: true,
         outputDirectory: path.join(outPath, 'green-tunnel/windows-installer'),

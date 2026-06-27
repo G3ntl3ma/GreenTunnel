@@ -15,7 +15,8 @@ dialog.showErrorBox = function(title, content) {
 };
 
 const setupEvents = require('./installers/windows/setupEvents');
-const { UnsupportedSystemProxyError } = require('../src/utils/system-proxy');
+// UnsupportedSystemProxyError lives in the green-tunnel package (outside this asar)
+// and is an ES module, so we cannot require() it here. Detect it structurally instead.
 
 if (setupEvents.handleSquirrelEvent()) {
     return;
@@ -195,7 +196,7 @@ async function turnOn() {
     
     const startStatus = await proxy.start({setProxy: proxySettings.systemProxy});
     const warning = startStatus?.error;
-    if (warning instanceof UnsupportedSystemProxyError) {
+    if (warning && (warning.warningCode === 'LINUX_GNOME_REQUIRED' || warning.name === 'UnsupportedSystemProxyError')) {
         await turnOff();
         await showLinuxGnomeRequirementWarning();
         return false;
