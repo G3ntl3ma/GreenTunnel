@@ -26,34 +26,55 @@
             </div>
             <p class="menu-label">Proxy server</p>
             <div class="menu-grid">
-                <label class="field-label" for="setting-ip">IP</label>
+                <label class="field-label" for="setting-ip">IP
+                    <button type="button" class="help-trigger" data-tooltip="Address the local proxy listens on. Usually 127.0.0.1." aria-label="Help for IP" aria-describedby="help-ip-text"><span id="help-ip-text" class="visually-hidden">Address the local proxy listens on. Usually 127.0.0.1.</span>ⓘ</button>
+                </label>
                 <input id="setting-ip" class="menu-input" type="text" value="127.0.0.1" tabindex="0">
 
-                <label class="field-label" for="setting-port">Port</label>
+                <label class="field-label" for="setting-port">Port
+                    <button type="button" class="help-trigger" data-tooltip="Port for the local proxy. Default is 8000." aria-label="Help for Port" aria-describedby="help-port-text"><span id="help-port-text" class="visually-hidden">Port for the local proxy. Default is 8000.</span>ⓘ</button>
+                </label>
                 <input id="setting-port" class="menu-input" type="number" min="1" max="65535" value="8000" tabindex="0">
             </div>
             <p class="menu-label">DNS</p>
             <div class="menu-grid">
-                <label class="field-label" for="setting-dns-type">DNS Type</label>
+                <label class="field-label" for="setting-dns-type">DNS Type
+                    <button type="button" class="help-trigger" data-tooltip="How DNS is resolved: HTTPS (DoH), TLS (DoT), or plain UDP." aria-label="Help for DNS Type" aria-describedby="help-dns-type-text"><span id="help-dns-type-text" class="visually-hidden">How DNS is resolved: HTTPS (DoH), TLS (DoT), or plain UDP.</span>ⓘ</button>
+                </label>
                 <select id="setting-dns-type" class="menu-input" tabindex="0">
                     <option value="https">HTTPS</option>
                     <option value="tls">TLS</option>
                     <option value="unencrypted">Unencrypted</option>
                 </select>
 
-                <label class="field-label dns-https" for="setting-dns-server">Server URL</label>
+                <label class="field-label dns-https" for="setting-dns-server">Server URL
+                    <button type="button" class="help-trigger" data-tooltip="DoH endpoint URL, e.g. https://cloudflare-dns.com/dns-query" aria-label="Help for Server URL" aria-describedby="help-dns-server-text"><span id="help-dns-server-text" class="visually-hidden">DoH endpoint URL, e.g. https://cloudflare-dns.com/dns-query</span>ⓘ</button>
+                </label>
                 <input id="setting-dns-server" class="menu-input dns-https" type="text" tabindex="0">
 
-                <label class="field-label dns-unencrypted" for="setting-dns-ip">DNS IP</label>
+                <label class="field-label dns-unencrypted" for="setting-dns-ip">DNS IP
+                    <button type="button" class="help-trigger" data-tooltip="IP of the DNS resolver (unencrypted mode only)." aria-label="Help for DNS IP" aria-describedby="help-dns-ip-text"><span id="help-dns-ip-text" class="visually-hidden">IP of the DNS resolver (unencrypted mode only).</span>ⓘ</button>
+                </label>
                 <input id="setting-dns-ip" class="menu-input dns-unencrypted" type="text" tabindex="0">
 
-                <label class="field-label dns-unencrypted" for="setting-dns-port">DNS Port</label>
+                <label class="field-label dns-unencrypted" for="setting-dns-port">DNS Port
+                    <button type="button" class="help-trigger" data-tooltip="Port of the DNS resolver (unencrypted mode only)." aria-label="Help for DNS Port" aria-describedby="help-dns-port-text"><span id="help-dns-port-text" class="visually-hidden">Port of the DNS resolver (unencrypted mode only).</span>ⓘ</button>
+                </label>
                 <input id="setting-dns-port" class="menu-input dns-unencrypted" type="number" min="1" max="65535" tabindex="0">
             </div>
             <div class="menu-switches">
-                <label class="switch-line"><input id="setting-https-only" type="checkbox" tabindex="0"> HTTPS only</label>
-                <label class="switch-line"><input id="setting-system-proxy" type="checkbox" checked tabindex="0"> Automatic system proxy</label>
-                <label class="switch-line"><input id="setting-tls-record-fragmentation" type="checkbox" tabindex="0"> TLS record fragmentation</label>
+                <label class="switch-line">
+                    <button type="button" class="help-trigger" data-tooltip="Block plain HTTP requests through the proxy." aria-label="Help for HTTPS only" aria-describedby="help-https-only-text"><span id="help-https-only-text" class="visually-hidden">Block plain HTTP requests through the proxy.</span>ⓘ</button>
+                    <input id="setting-https-only" type="checkbox" tabindex="0"> HTTPS only
+                </label>
+                <label class="switch-line">
+                    <button type="button" class="help-trigger" data-tooltip="Automatically configure OS proxy while GreenTunnel is on." aria-label="Help for automatic system proxy" aria-describedby="help-system-proxy-text"><span id="help-system-proxy-text" class="visually-hidden">Automatically configure OS proxy while GreenTunnel is on.</span>ⓘ</button>
+                    <input id="setting-system-proxy" type="checkbox" checked tabindex="0"> Automatic system proxy
+                </label>
+                <label class="switch-line">
+                    <button type="button" class="help-trigger" data-tooltip="Split TLS records to help bypass DPI inspection." aria-label="Help for TLS record fragmentation" aria-describedby="help-tls-record-fragmentation-text"><span id="help-tls-record-fragmentation-text" class="visually-hidden">Split TLS records to help bypass DPI inspection.</span>ⓘ</button>
+                    <input id="setting-tls-record-fragmentation" type="checkbox" tabindex="0"> TLS record fragmentation
+                </label>
             </div>
             <button id="save-settings" class="menu-item" tabindex="0">Apply Settings</button>
             <button id="restore-default-settings" class="menu-item" tabindex="0">Restore Defaults</button>
