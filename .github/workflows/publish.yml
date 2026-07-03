@@ -17,13 +17,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Pack local GreenTunnel core
-        working-directory: .
-        run: npm pack
-      
-      - name: Install Packed Core
+      - name: Install local GreenTunnel core
         working-directory: ./gui
-        run: npm install ../green-tunnel-2.0.2.tgz --save
+        run: npm install file:.. --save
 
       - name: Install Dependencies
         working-directory: ./gui
@@ -32,8 +28,8 @@ jobs:
       - name: Fix GUI Naming
         working-directory: ./gui
         run: |
-          sed -i '' 's/green-tunnel-gui/green-tunnel/g' package.json
-          sed -i '' 's/green-tunnel-gui/green-tunnel/g' package-lock.json
+          sed -i '' 's/@g3ntl3ma\/green-tunnel-gui/green-tunnel/g' package.json
+          sed -i '' 's/@g3ntl3ma\/green-tunnel-gui/green-tunnel/g' package-lock.json
 
       - name: Generate icons
         working-directory: ./gui
@@ -61,13 +57,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Pack local GreenTunnel core
-        working-directory: .
-        run: npm pack
-
-      - name: Install Packed Core
+      - name: Install local GreenTunnel core
         working-directory: ./gui
-        run: npm install ../green-tunnel-2.0.2.tgz --save
+        run: npm install file:.. --save
 
       - name: Install Dependencies
         working-directory: ./gui
@@ -76,8 +68,8 @@ jobs:
       - name: Fix GUI Naming
         working-directory: ./gui
         run: |
-          powershell -Command "(gc package.json) -replace 'green-tunnel-gui', 'green-tunnel' | Out-File -encoding ASCII package.json"
-          powershell -Command "(gc package-lock.json) -replace 'green-tunnel-gui', 'green-tunnel' | Out-File -encoding ASCII package-lock.json"
+          powershell -Command "(gc package.json) -replace '@g3ntl3ma/green-tunnel-gui', 'green-tunnel' | Out-File -encoding ASCII package.json"
+          powershell -Command "(gc package-lock.json) -replace '@g3ntl3ma/green-tunnel-gui', 'green-tunnel' | Out-File -encoding ASCII package-lock.json"
 
       - name: Generate icons
         working-directory: ./gui
@@ -109,13 +101,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Pack local GreenTunnel core
-        working-directory: .
-        run: npm pack
-
-      - name: Install Packed Core
+      - name: Install local GreenTunnel core
         working-directory: ./gui
-        run: npm install ../green-tunnel-2.0.2.tgz --save
+        run: npm install file:.. --save
 
       - name: Install Dependencies
         working-directory: ./gui
@@ -126,8 +114,8 @@ jobs:
       - name: Fix GUI Naming
         working-directory: ./gui
         run: |
-          sed -i 's/green-tunnel-gui/green-tunnel/g' package.json
-          sed -i 's/green-tunnel-gui/green-tunnel/g' package-lock.json
+          sed -i 's/@g3ntl3ma\/green-tunnel-gui/green-tunnel/g' package.json
+          sed -i 's/@g3ntl3ma\/green-tunnel-gui/green-tunnel/g' package-lock.json
 
       - name: Generate icons
         working-directory: ./gui

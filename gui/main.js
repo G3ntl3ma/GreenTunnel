@@ -321,7 +321,7 @@ app.on('activate', () => {
 
 app.whenReady().then(async () => {
     // green-tunnel is an ES module — must use dynamic import
-    gt = await import('green-tunnel');
+    gt = await import('@g3ntl3ma/green-tunnel');
     Proxy = gt.Proxy;
     proxySettings = await loadProxySettings();
 
