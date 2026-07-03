@@ -1,22 +1,22 @@
 {
-  "name": "green-tunnel",
-  "version": "2.0.2",
+  "name": "@g3ntl3ma/green-tunnel",
+  "version": "2.0.8",
   "description": "",
   "keywords": [
     "HTTPS",
     "SNI",
     "VPN"
   ],
-  "homepage": "https://github.com/SadeghHayeri/GreenTunnel#readme",
+  "homepage": "https://github.com/G3ntl3ma/GreenTunnel",
   "bugs": {
-    "url": "https://github.com/SadeghHayeri/GreenTunnel/issues"
+    "url": "https://github.com/G3ntl3ma/GreenTunnel/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SadeghHayeri/GreenTunnel.git"
+    "url": "git+https://github.com/G3ntl3ma/GreenTunnel.git"
   },
   "license": "MIT",
-  "author": "Sadegh Hayeri",
+  "author": "Luca Eisen",
   "files": [
     "bin",
     "src"

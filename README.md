@@ -45,7 +45,7 @@ Open-source tools that help people reach the free internet shouldn't die — and
 ### npm (recommended)
 
 ```bash
-npm install -g green-tunnel
+npm install -g "git+https://github.com/G3ntl3ma/GreenTunnel.git#v2.0.8"
 ```
 
 ### Graphical Interface (GUI)
