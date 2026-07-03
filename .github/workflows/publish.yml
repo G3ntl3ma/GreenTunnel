@@ -17,13 +17,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install local GreenTunnel core
-        working-directory: ./gui
-        run: npm install file:.. --save
+      - name: Install core dependencies
+        run: npm install --omit=dev
 
-      - name: Install Dependencies
+      - name: Install GUI dependencies
         working-directory: ./gui
-        run: npm install
+        run: |
+          npm install file:.. --save
+          npm install
 
       - name: Fix GUI Naming
         working-directory: ./gui
@@ -57,13 +58,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install local GreenTunnel core
-        working-directory: ./gui
-        run: npm install file:.. --save
+      - name: Install core dependencies
+        run: npm install --omit=dev
 
-      - name: Install Dependencies
+      - name: Install GUI dependencies
         working-directory: ./gui
-        run: npm install
+        run: |
+          npm install file:.. --save
+          npm install
 
       - name: Fix GUI Naming
         working-directory: ./gui
@@ -101,13 +103,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install local GreenTunnel core
-        working-directory: ./gui
-        run: npm install file:.. --save
+      - name: Install core dependencies
+        run: npm install --omit=dev
 
-      - name: Install Dependencies
+      - name: Install GUI dependencies
         working-directory: ./gui
         run: |
+          npm install file:.. --save
           npm install
           npm install -g electron-installer-debian
 
