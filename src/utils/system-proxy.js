@@ -2,7 +2,7 @@ import util from 'util';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {exec as _exec, spawn} from 'child_process';
+import {exec as _exec, execFile as _execFile, spawn} from 'child_process';
 import Registry from 'winreg';
 import getLogger from '../logger.js';
 import { resetWininetSettings } from '../scripts/windows/wininet-reset-settings.js';
@@ -12,13 +12,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const logger = getLogger('system-proxy');
 const exec = util.promisify(_exec);
+const execFile = util.promisify(_execFile);
 
 export class UnsupportedSystemProxyError extends Error {
 	constructor() {
 		super([
 			'================= ERROR ================',
 			'GreenTunnel cannot enable automatic system proxy',
-			'Reason: GNOME (gsettings) is required on Linux.',
+			'Reason: a writable GSettings proxy schema (gsettings/dconf) was not found.',
+			'This needs a GNOME/GTK-based desktop session (GNOME, Unity, Xfce, Cinnamon, MATE, ...).',
 			'Tip: run with --system-proxy=false and set the proxy manually',
 			'========================================'
 		].join('\n'));
@@ -37,27 +39,30 @@ class SystemProxy {
 }
 
 // TODO: Add path http_proxy and https_proxy
-// TODO: Support for non-gnome
+// Support is capability-based: any session where the GSettings proxy schema is
+// present and writable works (GNOME, Unity, Xfce, Cinnamon, MATE, ...)
 class LinuxSystemProxy extends SystemProxy {
 	static initialSettings = null;
 
-	//Check if GNOME is installed and can be used
+	static _gsettingsGet(schema, key) {
+		return execFile('gsettings', ['get', schema, key]);
+	}
+
+	static _gsettingsSet(schema, key, value) {
+		return execFile('gsettings', ['set', schema, key, String(value)]);
+	}
+
+	// Verify the requirements for GreenTunnel to function on Linux are given
 	static async ensureSupported() {
-		const desktop = String(process.env.XDG_CURRENT_DESKTOP || process.env.DESKTOP_SESSION || '').toLowerCase();
-		if (!desktop.includes("gnome") && !desktop.includes("unity")) {
+		let writable;
+		try {
+			writable = await execFile('gsettings', ['writable', 'org.gnome.system.proxy', 'mode']);
+		} catch {
+			// gsettings binary missing, schema not installed, or no dconf session.
 			throw new UnsupportedSystemProxyError();
 		}
 
-		try {
-			const { stdout } = await exec('gsettings writable org.gnome.system.proxy mode');
-			if (!/^true$/i.test(String(stdout || '').trim())) {
-				throw new UnsupportedSystemProxyError();
-			}
-		} catch (error) {
-			if (error instanceof UnsupportedSystemProxyError) {
-				throw error;
-			}
-
+		if (!/^true$/i.test(String(writable.stdout || '').trim())) {
 			throw new UnsupportedSystemProxyError();
 		}
 	}
@@ -68,11 +73,11 @@ class LinuxSystemProxy extends SystemProxy {
 		}
 
 		const [modeRaw, httpHostRaw, httpPortRaw, httpsHostRaw, httpsPortRaw] = await Promise.all([
-			exec('gsettings get org.gnome.system.proxy mode'),
-			exec('gsettings get org.gnome.system.proxy.http host'),
-			exec('gsettings get org.gnome.system.proxy.http port'),
-			exec('gsettings get org.gnome.system.proxy.https host'),
-			exec('gsettings get org.gnome.system.proxy.https port'),
+			LinuxSystemProxy._gsettingsGet('org.gnome.system.proxy', 'mode'),
+			LinuxSystemProxy._gsettingsGet('org.gnome.system.proxy.http', 'host'),
+			LinuxSystemProxy._gsettingsGet('org.gnome.system.proxy.http', 'port'),
+			LinuxSystemProxy._gsettingsGet('org.gnome.system.proxy.https', 'host'),
+			LinuxSystemProxy._gsettingsGet('org.gnome.system.proxy.https', 'port'),
 		]);
 
 		this.initialSettings = {
@@ -85,6 +90,7 @@ class LinuxSystemProxy extends SystemProxy {
 		logger.debug('[SYSTEM PROXY] captured initial linux proxy settings');
 	}
 
+	// gsettings prints strings wrapped in single quotes, e.g. 'none' or '127.0.0.1'.
 	static _parseGSettingsString(rawValue) {
 		const trimmed = String(rawValue || '').trim();
 		if (trimmed.startsWith("'") && trimmed.endsWith("'")) {
@@ -95,28 +101,18 @@ class LinuxSystemProxy extends SystemProxy {
 	}
 
 	static _parseGSettingsNumber(rawValue) {
-		const matched = String(rawValue || '').match(/(-?\d+)\s*$/);
-		if (!matched) {
-			return 0;
-		}
-
-		const parsed = Number.parseInt(matched[1], 10);
+		const parsed = Number.parseInt(String(rawValue || '').trim(), 10);
 		return Number.isNaN(parsed) ? 0 : parsed;
-	}
-
-	static _quoteShellString(value) {
-		const normalizedValue = String(value || '');
-		return `'${normalizedValue.replace(/'/g, `'\"'\"'`)}'`;
 	}
 
 	static async setProxy(ip, port) {
 		await this.ensureSupported();
 		await this.findInitialState();
-		await exec('gsettings set org.gnome.system.proxy mode manual');
-		await exec(`gsettings set org.gnome.system.proxy.http host ${LinuxSystemProxy._quoteShellString(ip)}`);
-		await exec(`gsettings set org.gnome.system.proxy.http port ${port}`);
-		await exec(`gsettings set org.gnome.system.proxy.https host ${LinuxSystemProxy._quoteShellString(ip)}`);
-		await exec(`gsettings set org.gnome.system.proxy.https port ${port}`);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy', 'mode', 'manual');
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.http', 'host', ip);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.http', 'port', port);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.https', 'host', ip);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.https', 'port', port);
 	}
 
 	static async unsetProxy() {
@@ -125,11 +121,11 @@ class LinuxSystemProxy extends SystemProxy {
 			return;
 		}
 
-		await exec(`gsettings set org.gnome.system.proxy mode ${this.initialSettings.mode || 'none'}`);
-		await exec(`gsettings set org.gnome.system.proxy.http host ${LinuxSystemProxy._quoteShellString(this.initialSettings.httpHost)}`);
-		await exec(`gsettings set org.gnome.system.proxy.http port ${this.initialSettings.httpPort}`);
-		await exec(`gsettings set org.gnome.system.proxy.https host ${LinuxSystemProxy._quoteShellString(this.initialSettings.httpsHost)}`);
-		await exec(`gsettings set org.gnome.system.proxy.https port ${this.initialSettings.httpsPort}`);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy', 'mode', this.initialSettings.mode || 'none');
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.http', 'host', this.initialSettings.httpHost);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.http', 'port', this.initialSettings.httpPort);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.https', 'host', this.initialSettings.httpsHost);
+		await LinuxSystemProxy._gsettingsSet('org.gnome.system.proxy.https', 'port', this.initialSettings.httpsPort);
 		this.initialSettings = null;
 		logger.debug('[SYSTEM PROXY] restored initial linux proxy settings');
 	}
