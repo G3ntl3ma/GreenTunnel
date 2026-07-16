@@ -50,7 +50,7 @@ npm install -g "git+https://github.com/G3ntl3ma/GreenTunnel.git"
 
 ### Graphical Interface (GUI)
 
-Download the pre-built installer for your OS from the [releases](https://github.com/SadeghHayeri/GreenTunnel/releases) page.
+Download the pre-built installer for your OS from the [releases](https://github.com/G3ntl3ma/GreenTunnel/releases) page.
 
 After installation, run with `gt` or `green-tunnel`.
 
