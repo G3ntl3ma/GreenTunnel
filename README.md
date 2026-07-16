@@ -45,7 +45,7 @@ Open-source tools that help people reach the free internet shouldn't die — and
 ### npm (recommended)
 
 ```bash
-npm install -g "git+https://github.com/G3ntl3ma/GreenTunnel.git#v2.0.8"
+npm install -g "git+https://github.com/G3ntl3ma/GreenTunnel.git"
 ```
 
 ### Graphical Interface (GUI)
@@ -64,7 +64,7 @@ docker run -p 8000:8000 sadeghhayeri/greentunnel
 
 ### npm
 ```bash
-npm uninstall -g @g3ntl3ma/green-tunnel@2.0.8
+npm uninstall -g @g3ntl3ma/green-tunnel
 ```
 
 ### GUI
