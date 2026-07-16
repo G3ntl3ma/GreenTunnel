@@ -64,7 +64,7 @@ docker run -p 8000:8000 sadeghhayeri/greentunnel
 
 ### npm
 ```bash
-npm uninstall -g green-tunnel
+npm uninstall -g @g3ntl3ma/green-tunnel@2.0.8
 ```
 
 ### GUI
