@@ -377,6 +377,19 @@ body {
     z-index: 30;
     transition: opacity 0.15s ease;
 }
+
+.switch-line .help-trigger::after {
+    left: calc(100%);
+    right: auto;
+    top: auto;
+    bottom: calc(100%);
+    transform: none;
+}
+
+.menu-switches {
+    overflow: visible;
+}
+
 .help-trigger:hover::after,
 .help-trigger:focus-visible::after {
     visibility: visible;
