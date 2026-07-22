@@ -69,7 +69,7 @@ npm uninstall -g @g3ntl3ma/green-tunnel
 
 ### GUI
 
-**Windows:** Settings -> Apps -> Green Tunnel -> uninstall
+**Windows:** Settings -> Apps -> Installed Apps -> Green Tunnel -> uninstall
 
 **macOS:** Move `green-tunnel.app` from Applications to Trash
 

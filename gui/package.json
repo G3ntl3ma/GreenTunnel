@@ -2,7 +2,7 @@
   "name": "@g3ntl3ma/green-tunnel-gui",
   "version": "2.0.7",
   "description": "bypasses DPI (Deep Packet Inspection) systems found in many ISPs (Internet Service Providers)",
-  "homepage": "https://github.com/SadeghHayeri/GreenTunnel",
+  "homepage": "https://github.com/G3ntl3ma/GreenTunnel",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -14,7 +14,7 @@
     "linux-installer": "electron-installer-debian --name green-tunnel --src release-builds/green-tunnel-linux-x64/ --arch amd64 --config installers/linux/debian.json",
     "windows-installer": "node installers/windows/createinstaller.js"
   },
-  "author": "Luca Eisen <luca_eisen@web.de> (https://github.com/G3ntl3ma/)",
+  "author": "Luca Eisen (https://github.com/G3ntl3ma/)",
   "license": "ISC",
   "devDependencies": {
     "@electron/packager": "^19.0.5",

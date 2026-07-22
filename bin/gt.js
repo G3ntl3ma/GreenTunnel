@@ -70,9 +70,9 @@ const argv = yargs(hideBin(process.argv))
 
 	.option('verbose', {
 		alias: 'v',
-		type: 'boolean',
+		type: 'string',
 		describe: 'debug mode',
-		default: false,
+		default: "",
 	})
 
 	.option('system-proxy', {
