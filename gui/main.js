@@ -238,7 +238,7 @@ async function showLinuxGnomeRequirementWarning() {
         buttons: ['OK'],
         defaultId: 0,
         noLink: true,
-        message: 'Automatic system proxy on Linux currently requires GNOME (gsettings). GreenTunnel was not enabled.',
+        message: 'Automatic system proxy on Linux currently requires GNOME/GTK(gsettings). Try turning off automatic system proxy in the settings and set the browser or system proxy to this app\'s IP and port.',
     };
 
     const response = win

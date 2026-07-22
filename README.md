@@ -175,6 +175,8 @@ Standard DNS lookups can be intercepted or spoofed by ISPs to block domains at t
 
 ## Troubleshooting
 
+### Restore proxy on improper shut down
+
 If GreenTunnel is not shut down properly, the system proxy settings might not be restored to their previous values. Here is how the system settings can be restored:
 
 ### Windows
@@ -200,6 +202,19 @@ Settings -> Network -> Network Proxy -> Off
 ```bash
 gsettings reset-recursively org.gnome.system.proxy
 ```
+
+### Automatic system proxy not supported
+
+GreenTunnel needs GNOME/GTK on Linux to automatically set the system proxy.
+Turn off automatic system proxy and point browser/OS proxy at the IP and port GreenTunnel is using.
+
+**CLI:**
+```bash
+gt --system-proxy false
+```
+
+**GUI:**
+uncheck automatic system proxy.
 
 ## Contributing
 

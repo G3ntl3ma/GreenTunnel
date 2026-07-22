@@ -21,7 +21,7 @@ export class UnsupportedSystemProxyError extends Error {
 			'GreenTunnel cannot enable automatic system proxy',
 			'Reason: a writable GSettings proxy schema (gsettings/dconf) was not found.',
 			'This needs a GNOME/GTK-based desktop session (GNOME, Unity, Xfce, Cinnamon, MATE, ...).',
-			'Tip: run with --system-proxy=false and set the proxy manually',
+			'Tip: run with --system-proxy=false and adjust the proxy manually in the system settings or browser',
 			'========================================'
 		].join('\n'));
 		this.name = 'UnsupportedSystemProxyError';
