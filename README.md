@@ -54,12 +54,6 @@ Download the pre-built installer for your OS from the [releases](https://github.
 
 After installation, run with `gt` or `green-tunnel`.
 
-### Docker
-
-```bash
-docker run -p 8000:8000 sadeghhayeri/greentunnel
-```
-
 ## Uninstalling
 
 ### npm
