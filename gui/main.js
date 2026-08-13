@@ -146,7 +146,10 @@ async function normalizeProxySettings(rawSettings) {
         "dns-ip": next["dns"]["ip"],
         "dns-port": next["dns"]["port"],
     }
-    await gt.validateFlags(args);
+    const skipBindProbe = isOn
+        && next.ip === proxySettings.ip
+        && next.port === proxySettings.port;
+    await gt.validateFlags(args, { skipBindProbe });
 
     return next;
 }
@@ -246,6 +249,23 @@ async function showLinuxGnomeRequirementWarning() {
         : await dialog.showMessageBox(dialogOptions);
 
     return response.response === 0;
+}
+
+async function showSettingsValidationError(message) {
+    const dialogOptions = {
+        type: 'warning',
+        buttons: ['OK'],
+        defaultId: 0,
+        noLink: true,
+        message: 'Settings could not be saved',
+        detail: String(message),
+    };
+
+    if (win) {
+        await dialog.showMessageBox(win, dialogOptions);
+    } else {
+        await dialog.showMessageBox(dialogOptions);
+    }
 }
 
 async function enableWithConfirmation() {
@@ -395,26 +415,28 @@ ipcMain.handle('get-proxy-settings', () => {
     return cloneSettings(proxySettings);
 });
 
-ipcMain.handle('update-proxy-settings', async (event, nextSettings) => {
-    const normalized = await normalizeProxySettings(nextSettings);
-    await saveProxySettings(normalized);
-    proxySettings = normalized;
+ipcMain.handle('save-proxy-settings', async (event, nextSettings) => {
+    try {
+        const normalized = await normalizeProxySettings(nextSettings);
+        await saveProxySettings(normalized);
+        proxySettings = normalized;
 
-    if (isOn) {
-        await turnOn();
+        return cloneSettings(proxySettings);
+    } catch (error) {
+        await showSettingsValidationError(error?.message || error);
+        throw error;
     }
-
-    return cloneSettings(proxySettings);
 });
 
 ipcMain.handle('reset-proxy-settings', async () => {
-    const defaults = await normalizeProxySettings(cloneSettings(defaultProxySettings));
-    await saveProxySettings(defaults);
-    proxySettings = defaults;
+    try {
+        const defaults = await normalizeProxySettings(cloneSettings(defaultProxySettings));
+        await saveProxySettings(defaults);
+        proxySettings = defaults;
 
-    if (isOn) {
-        await turnOn();
+        return cloneSettings(proxySettings);
+    } catch (error) {
+        await showSettingsValidationError(error?.message || error);
+        throw error;
     }
-
-    return cloneSettings(proxySettings);
 });

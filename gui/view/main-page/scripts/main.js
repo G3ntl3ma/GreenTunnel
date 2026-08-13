@@ -1,7 +1,8 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, clipboard } = require('electron');
 
 $(document).ready(function() {
     let isMenuOpen = false;
+    let savedProxySettings = null;
     const settingsFieldIds = [
         'setting-ip',
         'setting-port',
@@ -41,6 +42,8 @@ $(document).ready(function() {
             return;
         }
 
+        savedProxySettings = settings;
+
         $('#setting-ip').val(settings.ip);
         $('#setting-port').val(settings.port);
         $('#setting-dns-type').val(settings.dns.type);
@@ -50,17 +53,40 @@ $(document).ready(function() {
         $('#setting-https-only').prop('checked', Boolean(settings.httpsOnly));
         $('#setting-system-proxy').prop('checked', Boolean(settings.systemProxy));
         $('#setting-tls-record-fragmentation').prop('checked', Boolean(settings.tlsRecordFragmentation));
-        
+
+        $('#proxy-address').text(`${settings.ip}:${settings.port}`);
+
         updateDnsFieldVisibility();
     }
 
     function updateDnsFieldVisibility() {
         const type = String($('#setting-dns-type').val());
-    
+
         $('.dns-https').toggleClass('hidden', !(type === 'https'));
         $('.dns-unencrypted').toggleClass('hidden', !(type === 'unencrypted'));
     }
-    
+
+    async function revertToSavedSettings() {
+        const lastGood = await ipcRenderer.invoke('get-proxy-settings');
+        applySettingsToForm(lastGood);
+    }
+
+    async function saveSettings() {
+        try {
+            const updated = await ipcRenderer.invoke('save-proxy-settings', collectSettings());
+            applySettingsToForm(updated);
+            setFeedback('');
+        } catch (error) {
+            await revertToSavedSettings();
+        }
+    }
+
+    function closeSettingsMenu() {
+        isMenuOpen = false;
+        $('#settings-menu').addClass('hidden');
+        $('#settings-menu').attr('aria-hidden', 'true');
+    }
+
     $('#setting-dns-type').on('change', updateDnsFieldVisibility);
 
     $('#close-button').on('click', () => {
@@ -71,8 +97,11 @@ $(document).ready(function() {
         ipcRenderer.send('on-off-button');
     });
 
-    $('#settings-button').on('click', (event) => {
+    $('#settings-button').on('click', async (event) => {
         event.stopPropagation();
+        if (isMenuOpen) {
+            await saveSettings();
+        }
         isMenuOpen = !isMenuOpen;
         $('#settings-menu').toggleClass('hidden', !isMenuOpen);
         $('#settings-menu').attr('aria-hidden', String(!isMenuOpen));
@@ -93,17 +122,6 @@ $(document).ready(function() {
         ipcRenderer.send('set-window-size', preset);
     });
 
-    $('#save-settings').on('click', async () => {
-        setFeedback('');
-        try {
-            const updated = await ipcRenderer.invoke('update-proxy-settings', collectSettings());
-            applySettingsToForm(updated);
-            setFeedback('Settings applied.');
-        } catch (error) {
-            setFeedback(String(error?.message || error), true);
-        }
-    });
-
     $('#restore-default-settings').on('click', async () => {
         setFeedback('');
         try {
@@ -111,8 +129,21 @@ $(document).ready(function() {
             applySettingsToForm(restored);
             setFeedback('Defaults restored.');
         } catch (error) {
-            setFeedback(String(error?.message || error), true);
+            await revertToSavedSettings();
         }
+    });
+
+    $('#proxy-address-copy').on('click', () => {
+        if (!savedProxySettings) {
+            return;
+        }
+
+        const address = `${savedProxySettings.ip}:${savedProxySettings.port}`;
+        clipboard.writeText(address);
+
+        const $hint = $('.proxy-address-copy-hint');
+        $hint.text('Copied!');
+        setTimeout(() => $hint.text('Copy'), 1500);
     });
 
     for (const id of settingsFieldIds) {
@@ -122,19 +153,19 @@ $(document).ready(function() {
             }
 
             event.preventDefault();
-            $('#save-settings').trigger('click');
+            await saveSettings();
+            closeSettingsMenu();
         });
     }
 
-    $(document).on('click', (event) => {
+    $(document).on('click', async (event) => {
         if (!isMenuOpen) {
             return;
         }
 
         if ($(event.target).closest('#settings-menu, #settings-button').length === 0) {
-            isMenuOpen = false;
-            $('#settings-menu').addClass('hidden');
-            $('#settings-menu').attr('aria-hidden', 'true');
+            await saveSettings();
+            closeSettingsMenu();
         }
     });
 
