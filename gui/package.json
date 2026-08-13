@@ -1,6 +1,6 @@
 {
   "name": "@g3ntl3ma/green-tunnel-gui",
-  "version": "2.0.7",
+  "version": "2.0.9",
   "description": "bypasses DPI (Deep Packet Inspection) systems found in many ISPs (Internet Service Providers)",
   "homepage": "https://github.com/G3ntl3ma/GreenTunnel",
   "main": "main.js",
