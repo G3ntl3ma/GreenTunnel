@@ -15,7 +15,7 @@ export class FlagValidationError extends Error {
 
 //Strictly validate all flags where extensive validation is necessary
 //Flags validated: --ip, --port, --dns-server, --dns-ip, --dns-port
-export async function validateFlags(args){
+export async function validateFlags(args, options = {}){
 //--ip and --port
 if (!net.isIP(args["ip"])) {
     throw new FlagValidationError('--ip', 'must be a valid IPv4 or IPv6 address', 'Provide an address like 127.0.0.1');
@@ -25,7 +25,9 @@ if (!Number.isInteger(args["port"]) || args["port"] < 1 || args["port"] > 65535)
     throw new FlagValidationError('--port', 'must be an integer between 1 and 65535', 'Choose a port between 1 and 65535');
 }
 //test if valid proxy can be created
-await probeBindAddress(args["ip"], args["port"]);
+if (!options.skipBindProbe) {
+    await probeBindAddress(args["ip"], args["port"]);
+}
 
 //--dns-server
 if(args["dns-type"] === "https"){
